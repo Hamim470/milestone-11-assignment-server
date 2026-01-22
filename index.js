@@ -40,8 +40,9 @@ async function run() {
     await client.connect();
 
     const assignmentCollection = client.db('assignment-11').collection("assignments");
+    const submittedCollection = client.db('assignment-11').collection("submittedAssignments");
 
-  
+
 
 
     // save a assignment data in 
@@ -51,6 +52,56 @@ async function run() {
       const result = await assignmentCollection.insertOne(assignmentData);
       res.send(result);
     });
+
+    // get all assignment data
+    app.get('/assignments',async (req,res)=>{
+      const result=await assignmentCollection.find().toArray();
+      res.send(result);
+    })
+    // get data by id
+    app.get('/assignment/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={_id:new ObjectId(id)};
+      const result= await assignmentCollection.findOne(query);
+      res.send(result); 
+    })
+
+    // delete data from assignments
+    app.delete('/assignment/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={_id:new ObjectId(id)};
+      const result=assignmentCollection.deleteOne(query);
+      res.send(result);
+    })
+
+    // update data of the assignment
+    app.patch('/update/:id',async(req,res)=>{
+      const id=req.params.id;
+      const updatedData=req.body;
+      const filter={_id:new ObjectId(id)};
+      const updatedDocument={
+        $set:{
+          title:updatedData.title,
+          description:updatedData.description,
+          marks:updatedData.marks,
+          thumbnail:updatedData.thumbnail,
+          difficulty:updatedData.difficulty,
+          dueDate:updatedData.dueDate
+        }
+      }
+      const result=await assignmentCollection.updateOne(filter,updatedDocument);
+      res.send(result)
+    })
+
+
+
+    // Submitted Assignment
+    app.post('/submitted-assignment',async(req,res)=>{
+      const submittedAssignment=req.body;
+      const result=await submittedCollection.insertOne(submittedAssignment);
+      res.send(result);
+    })
+
 
 
     // Send a ping to confirm a successful connection
