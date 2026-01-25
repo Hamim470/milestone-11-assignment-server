@@ -102,6 +102,13 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/my-submitted-assignments',async(req,res)=>{
+      const email=req.query.email;
+      const query={submittedBy:email};
+      const result=await submittedCollection.find(query).toArray();
+      res.send(result);
+    })
+
 
 
     // Send a ping to confirm a successful connection
